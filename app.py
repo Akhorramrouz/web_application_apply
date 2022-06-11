@@ -109,6 +109,7 @@ if not st.session_state.is_signed_in:
 
 
                 else:
+                    st.write("   ",confirmed_pass, password)
                     st.error('Your username and pass does not match')
  
     if selected_page_before_sign_in == 'Sign up':
