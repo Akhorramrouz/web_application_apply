@@ -1,4 +1,6 @@
 from email.policy import strict
+import gspread
+from db import *
 from typing import final
 import streamlit as st
 from send_gmail import send_gmail
@@ -69,9 +71,9 @@ if not st.session_state.is_signed_in:
                 # the code is correct
                 if st.session_state.verification_code_claimed_by_user == st.session_state.real_verification_code:
                     st.success('You are registered sucessfully')
-                    df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+                    df = load_db()
                     df = df.append(st.session_state.new_data,ignore_index=True)
-                    df.to_excel('db_streamlit.xlsx')
+                    update_db(df)
                     st.write('Data is added to df')
                     st.write('Now you can Sign in')
                     time.sleep(2)
@@ -97,7 +99,7 @@ if not st.session_state.is_signed_in:
             sign_in_button = st.button('Sign in')
             forgot_password = st.button('forgot password')
 
-            df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+            df = load_db()
 
             
             
@@ -158,7 +160,7 @@ if not st.session_state.is_signed_in:
         if submit_sign_up:
             st.session_state.sign_up_mail = email_address
             st.session_state.sign_up_name = first_name
-            df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+            df = load_db()
             set_emails = set(df.email_address)
             new_data = {
                 'index' : len(df)+1,
@@ -201,7 +203,7 @@ if not st.session_state.is_signed_in:
 
 
 ##----------------------------
-df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+df = load_db()
 if st.session_state.is_signed_in:
     log_out_button = st.button('Log Out',)
     
@@ -256,7 +258,7 @@ if st.session_state.is_signed_in:
             st.write('Well Done!')
             st.write("Now Let's choose research interests" )
             st.session_state.step_counter = 1
-            df.to_excel('db_streamlit.xlsx')
+            update_db(df)
             st.experimental_rerun()
             
 
@@ -296,7 +298,7 @@ if st.session_state.is_signed_in:
                 st.experimental_rerun()
 
 
-                df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+                df = load_db()
 
 
         with right_ri:
@@ -309,7 +311,7 @@ if st.session_state.is_signed_in:
                     ri_counter
                     df.at[st.session_state.index,f'RI_{ri_counter+1}'] = st.session_state.list_research_interests[ri_counter]
 
-                df.to_excel('db_streamlit.xlsx')
+                update_db(df)
                 st.session_state.step_counter = 2
                 st.experimental_rerun()
 
@@ -327,14 +329,14 @@ if st.session_state.is_signed_in:
             # put data in final excel
             df.at[st.session_state.index,'strictness'] = strictness
             df.at[st.session_state.index,'expandability'] = expandability
-            df.to_excel('db_streamlit.xlsx')
+            update_db(df)
             st.session_state.step_counter = 3
             st.experimental_rerun()
 
 
 
     if st.session_state.step_counter == 3:
-        df2 = pd.read_excel('db_streamlit.xlsx',index_col=0)
+        df2 = load_db()
         df2 = df2.fillna("**")
         "Please confirm that you are looking for professors whose research intersts are :"
         for ri_index in range(1,8):
@@ -359,7 +361,7 @@ if st.session_state.is_signed_in:
         if final_confirmation:
             st.success("your data has been collected, you will recive an email as soon as your data is ready in few hours")
             df.at[st.session_state.index,'last check'] = True
-            df.to_excel('db_streamlit.xlsx')
+            update_db(df)
             st.session_state.step_counter = 4
             st.experimental_rerun()
 
