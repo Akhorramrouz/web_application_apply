@@ -2,28 +2,28 @@ import smtplib
 import random
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import pandas as pd
 
 
-def send_gmail(reciver_email,reciver_name):
-    verification_code = random.randint(100000,999999)
+def send_forgotten_password(reciver_email,reciver_name):
+
+    df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+    user_ind = df.loc[df.email_address == reciver_email].index
+    pass_user = df.at[user_ind[0],'password'] 
+
     mail_content = f"""
     <html>
-    <h2>Dear {reciver_name},</h2>
+    <h3>Dear {reciver_name}</h3>,
     <body>
-    <font size=05>
-    <p style="color:#000AFA">
-    You have chosen the best way to apply and find fund and best professors that suit for you,
-    .<br> We are sure that is not going to be easy, however it will have the sweetest results
-    <br>
-    <br>
-    </p>
+    <font size=04>
+    Hope this message finds you well,
 
-    <b style="color:#00FF00"> your activation code is: {verification_code}</b>
+    We have recivied a request indicating that you have forgotten you password.<br>
+    As a reminder we can mention that your password is: <b>{pass_user}</b>
     </font>
     </body>
     </html>
-     """
-    
+    """
     #The mail addresses and password
     sender_address = 'apply4fund@gmail.com'
     sender_pass = 'glcrtwnsthfjrtfo'
@@ -32,9 +32,9 @@ def send_gmail(reciver_email,reciver_name):
     message = MIMEMultipart()
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'Verification code'   #The subject line
+    message['Subject'] = 'Forgotten Password'   #The subject line
     #The body and the attachments for the mail
-    message.attach(MIMEText(mail_content, 'plain'))
+    message.attach(MIMEText(mail_content, 'html'))
     #Create SMTP session for sending the mail
     session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
     session.starttls() #enable security
@@ -43,4 +43,4 @@ def send_gmail(reciver_email,reciver_name):
     session.sendmail(sender_address, receiver_address, text)
     session.quit()
     print('Mail Sent')
-    return verification_code
+    return pass_user

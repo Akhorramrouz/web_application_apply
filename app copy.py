@@ -1,8 +1,6 @@
 from email.policy import strict
-from typing import final
 import streamlit as st
 from send_gmail import send_gmail
-from forgot_password import send_forgotten_password
 from streamlit_option_menu import option_menu
 import pandas as pd
 import json
@@ -20,11 +18,6 @@ months_of_year = [
     ]
 if 'is_signed_in' not in st.session_state:
     st.session_state.is_signed_in = False
-
-if 'is_country_selected' not in st.session_state:
-    st.session_state.is_country_selected = False
-if 'step_counter' not in st.session_state:
-    st.session_state.step_counter = 0
 if 'show_verification' not in st.session_state:
     st.session_state.show_verification = False
 if 'verification_code_claimed_by_user' not in st.session_state:
@@ -95,25 +88,20 @@ if not st.session_state.is_signed_in:
             username = st.text_input('Your email adress')
             password = st.text_input('Password')
             sign_in_button = st.button('Sign in')
-            forgot_password = st.button('forgot password')
 
-            df = pd.read_excel('db_streamlit.xlsx',index_col=0)
-
-            
-            
             if sign_in_button:
+                df = pd.read_excel('db_streamlit.xlsx',index_col=0)
                 try:
                     st.session_state.index = list(df.email_address).index(username)
                     confirmed_pass = df.iloc[st.session_state.index].password
                 except:
                     st.session_state.index = -1
+
+
                 
                 
                 if st.session_state.index == -1:
                     st.error('there is no account with this email adress')
-                
-                elif not username:
-                    st.error("Please Enter your mail address")
                 
                 elif password == confirmed_pass:
                     st.success('You are Sined in Sucessfully')
@@ -126,18 +114,6 @@ if not st.session_state.is_signed_in:
                     st.write("   ",confirmed_pass, password)
                     st.error('Your username and pass does not match')
  
-    
-            if forgot_password:
-
-                if not username:
-                    st.error("Please Enter your mail address")
-                else:
-                    st.warning('Please find your password at your email')
-                    send_forgotten_password(username,df.iloc[st.session_state.index].first_name)
-
-
-    
-    
     if selected_page_before_sign_in == 'Sign up':
         st.title('Sign Up')
         email_address = st.text_input('Email Adress')
@@ -201,34 +177,30 @@ if not st.session_state.is_signed_in:
 
 
 ##----------------------------
-df = pd.read_excel('db_streamlit.xlsx',index_col=0)
 if st.session_state.is_signed_in:
     log_out_button = st.button('Log Out',)
-    
-    if  4 > st.session_state.step_counter > 0:
-        back_button = st.button("Back")
-        if back_button:
-            st.session_state.step_counter -= 1
-            st.experimental_rerun()
-
     if log_out_button:
         st.session_state.is_signed_in = False
         st.experimental_rerun()
+    st.session_state.selected_page_after_sign_in = option_menu(
+        menu_title='Pages',
+        options = ['Country', 'Research Interests', 'Parameters', 'Last Check'],
+        orientation='horizontal',
+        icons=['map','mortarboard','motherboard'])
+
+
 
     st.write("---")
+    st.write(st.session_state.selected_page_after_sign_in)
     st.subheader(f'Welcome {st.session_state.sign_up_name.capitalize()}')
 
-    # select countries page
 
+    if st.session_state.selected_page_after_sign_in == 'Country':
 
-
-    if st.session_state.step_counter == 0:
-        if df.at[st.session_state.index,'last check']:
-            st.session_state.step_counter = 4
-            st.experimental_rerun()
         st.subheader("Let's select all of the countries you are going to apply for")
         left,right = st.columns(2)
         with left:
+
             st.session_state.usa = st.checkbox('United States of America ')
             st.session_state.canada = st.checkbox('Canada')
             st.session_state.australia = st.checkbox('Australia')
@@ -239,30 +211,14 @@ if st.session_state.is_signed_in:
 
         submit_country_button = st.button('Submit Selected Country')
         if submit_country_button:
-            if st.session_state.usa:
-                df.at[st.session_state.index,'USA'] = True
-            else:
-                df.at[st.session_state.index,'USA'] = False
-            if st.session_state.canada:
-                df.at[st.session_state.index,'Canada'] = True
-            else:
-                df.at[st.session_state.index,'Canada'] = False            
-            if st.session_state.australia:
-                df.at[st.session_state.index,'Australia'] = True
-            else:
-                df.at[st.session_state.index,'Australia'] = False
-
-
             st.write('Well Done!')
             st.write("Now Let's choose research interests" )
-            st.session_state.step_counter = 1
-            df.to_excel('db_streamlit.xlsx')
-            st.experimental_rerun()
-            
+            st.write("Choose Research Interests from navigation bar top of the page" )
 
 
-    if st.session_state.step_counter == 1:
-        
+
+    if st.session_state.selected_page_after_sign_in == 'Research Interests':
+
         left_ri, right_ri = st.columns(2)
         if "counter_research_interest" not in st.session_state:
             st.session_state.counter_research_interest = 0
@@ -273,49 +229,41 @@ if st.session_state.is_signed_in:
         if "input_place_holder" not in st.session_state:
             st.session_state.input_place_holder = st.empty()
 
-    
 
 
-        
         with left_ri:
             st.header("Your Research Intersts")
             st.session_state.ri = st.session_state.input_place_holder.text_input("please enter your reserach intersts",key = f"{st.session_state.counter_research_interest}",)
-            st.session_state.ri = str(st.session_state.ri).lower()
-            
-            ri_df = pd.DataFrame({'Selected Research Intersts' : st.session_state.list_research_interests})
-            st.dataframe(ri_df)
-
-           
-            st.markdown(f'<h1 style="color:#FFFF00;font-size:18px;">{"Please make sure to click --Add-- after typing each of your research interests"}</h1>', unsafe_allow_html=True)
+            st.session_state.ri
             if st.button('Add'):
                 st.session_state.list_research_interests.append(st.session_state.ri.title())
                 st.session_state.counter_research_interest += 1
-                st.session_state.ri = st.session_state.input_place_holder.text_input("please enter your reserach intersts",key = f"{st.session_state.counter_research_interest}",)
+                ri = st.session_state.input_place_holder.text_input("please enter your reserach intersts",key = f"{st.session_state.counter_research_interest}",)
+
                 st.session_state.list_research_interests = list(set(st.session_state.list_research_interests))
                 ri_df = pd.DataFrame({'Selected Research Intersts' : st.session_state.list_research_interests})
-                st.experimental_rerun()
+                st.dataframe(ri_df)
 
 
                 df = pd.read_excel('db_streamlit.xlsx',index_col=0)
-
+  
+                
+                for i in range(len(ri_df)):
+                    st.session_state.index
+                    f"RI_{i+1}"
+                    st.write(ri_df.iloc[i])
+                    df.at[st.session_state.index,f"RI_{i+1}"] = ri_df.iloc[i,0]
+                st.dataframe(df)
+                df.to_excel('db_streamlit.xlsx')
 
         with right_ri:
             show_lottie_animation('reserach_animation.json')
 
-            submit_research_interest_button = st.button('Submit')
-            if submit_research_interest_button:
-                # put data in main data fram and write it to excel
-                for ri_counter in range(len(st.session_state.list_research_interests)):
-                    ri_counter
-                    df.at[st.session_state.index,f'RI_{ri_counter+1}'] = st.session_state.list_research_interests[ri_counter]
-
-                df.to_excel('db_streamlit.xlsx')
-                st.session_state.step_counter = 2
-                st.experimental_rerun()
 
 
 
-    if st.session_state.step_counter == 2:
+
+    if st.session_state.selected_page_after_sign_in == 'Parameters':
         "Let's Set The Parameters"
 
         strictness = st.slider('How Strict Shall We look for professors ?',min_value=1,max_value=500)
@@ -324,46 +272,18 @@ if st.session_state.is_signed_in:
 
         submit_params = st.button("Submit Parameters")
         if submit_params:
-            # put data in final excel
+            df = pd.read_excel('db_streamlit.xlsx',index_col=0)
+
             df.at[st.session_state.index,'strictness'] = strictness
             df.at[st.session_state.index,'expandability'] = expandability
             df.to_excel('db_streamlit.xlsx')
-            st.session_state.step_counter = 3
-            st.experimental_rerun()
 
 
-
-    if st.session_state.step_counter == 3:
+    if st.session_state.selected_page_after_sign_in == 'Last Check':
         df2 = pd.read_excel('db_streamlit.xlsx',index_col=0)
-        df2 = df2.fillna("**")
-        "Please confirm that you are looking for professors whose research intersts are :"
-        for ri_index in range(1,8):
-            selected_ri = df2.at[st.session_state.index,f'RI_{ri_index}']
-            if selected_ri != "**":
-                st.markdown(f'<h1 style="color:#00FFFF;font-size:14px;">{selected_ri}</h1>', unsafe_allow_html=True)
+        df3 = df2.loc[st.session_state.index].astype('str')
+        st.dataframe(df3)
 
-        st.write("---")
-        if df.at[st.session_state.index,'Canada']:
-            st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in Canada"}</h2>', unsafe_allow_html=True)
-        if df.at[st.session_state.index,'USA']:
-            st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in USA"}</h2>', unsafe_allow_html=True)
-        if df.at[st.session_state.index,'Australia']:
-            st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in Australia"}</h2>', unsafe_allow_html=True)
-
-        
-
-
-        st.markdown(f'<h1 style="color:#FFFF00;font-size:20px;">{"Please Confirm the Above Data"}</h1>', unsafe_allow_html=True)
+        "Please Confirm the Above Data"
 
         final_confirmation = st.button('final_confirmation')
-        if final_confirmation:
-            st.success("your data has been collected, you will recive an email as soon as your data is ready in few hours")
-            df.at[st.session_state.index,'last check'] = True
-            df.to_excel('db_streamlit.xlsx')
-            st.session_state.step_counter = 4
-            st.experimental_rerun()
-
-
-    if st.session_state.step_counter == 4:
-        st.markdown(f'<center style="color:#AAFFAA;font-size:36px;">{"You have already requested for data of 10 professors"}</center>', unsafe_allow_html=True)
-        
