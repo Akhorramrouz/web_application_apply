@@ -34,7 +34,7 @@ def send_gmail(reciver_email,reciver_name):
     message['To'] = receiver_address
     message['Subject'] = 'Verification code'   #The subject line
     #The body and the attachments for the mail
-    message.attach(MIMEText(mail_content, 'plain'))
+    message.attach(MIMEText(mail_content, 'html'))
     #Create SMTP session for sending the mail
     session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
     session.starttls() #enable security

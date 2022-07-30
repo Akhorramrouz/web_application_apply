@@ -223,7 +223,7 @@ if st.session_state.is_signed_in:
 
 
     if st.session_state.step_counter == 0:
-        if df.at[st.session_state.index,'last check']:
+        if df.at[st.session_state.index,'last check'] == True:
             st.session_state.step_counter = 4
             st.experimental_rerun()
         st.subheader("Let's select all of the countries you are going to apply for")
