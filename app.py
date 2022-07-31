@@ -331,7 +331,7 @@ if st.session_state.is_signed_in:
     if st.session_state.step_counter == 2:
         "Let's Set The Parameters"
 
-        strictness = st.slider('How Strict Shall We look for professors ?',min_value=1,max_value=500)
+        strictness = st.slider('How Strict Shall We look for professors ?',min_value=1,max_value=500,)
 
         expandability = st.slider('How Much Shall we Expand Your Research Interests?',min_value=1,max_value=4)
 
