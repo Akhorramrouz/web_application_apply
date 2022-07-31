@@ -270,7 +270,13 @@ if st.session_state.is_signed_in:
             st.session_state.counter_research_interest = 0
 
         if "list_research_interests" not in st.session_state:
+            df = load_db()
+            df = df.fillna("***")
             st.session_state.list_research_interests = []
+            for ri_list_index in range(7):
+                if df.at[st.session_state.index,f"RI_{ri_list_index}"] != "***":
+                    st.session_state.list_research_interests.append(df.at[st.session_state.index,f"RI_{ri_list_index}"])
+                    
 
         if "input_place_holder" not in st.session_state:
             st.session_state.input_place_holder = st.empty()
