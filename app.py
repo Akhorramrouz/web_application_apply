@@ -310,6 +310,11 @@ if st.session_state.is_signed_in:
         with right_ri:
             show_lottie_animation('reserach_animation.json')
 
+            clear_list_button = st.button('Clear List')
+            if clear_list_button:
+                st.session_state.list_research_interests = []
+                st.experimental_rerun()
+
             submit_research_interest_button = st.button('Submit')
             if submit_research_interest_button:
                 # put data in main data fram and write it to excel
