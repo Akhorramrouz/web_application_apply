@@ -345,11 +345,11 @@ if st.session_state.is_signed_in:
                 st.markdown(f'<h1 style="color:#00FFFF;font-size:14px;">{selected_ri}</h1>', unsafe_allow_html=True)
 
         st.write("---")
-        if df.at[st.session_state.index,'Canada']:
+        if df.at[st.session_state.index,'Canada'] == "True":
             st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in Canada"}</h2>', unsafe_allow_html=True)
-        if df.at[st.session_state.index,'USA']:
+        if df.at[st.session_state.index,'USA'] == "True":
             st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in USA"}</h2>', unsafe_allow_html=True)
-        if df.at[st.session_state.index,'Australia']:
+        if df.at[st.session_state.index,'Australia'] == "True":
             st.markdown(f'<h1 style="color:#AAFFAA;font-size:18px;">{"in Australia"}</h2>', unsafe_allow_html=True)
 
         
