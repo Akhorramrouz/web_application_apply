@@ -1,4 +1,5 @@
 import gspread
+from gspread_dataframe import set_with_dataframe
 import pandas as pd
 
 def load_db():
@@ -13,4 +14,5 @@ def update_db(df):
     gc = gspread.service_account('apply4fund-db-e189a230919b.json')
     sh = gc.open_by_key("1sX_GB2E5MazKsafxF1qLWkUMVjrlf5FljwYyghMPnic")
     worksheet = sh.sheet1
-    worksheet.update([df.columns.values.tolist()] + df.values.tolist())
+    set_with_dataframe(worksheet,df)
+    
