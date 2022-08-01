@@ -1,6 +1,7 @@
 from email.policy import strict
 import gspread
 from db import *
+from db import save_users_extracted_data
 from typing import final
 import streamlit as st
 from send_gmail import send_gmail
