@@ -6,7 +6,7 @@ def create_prof_db_base_on_country(db, final_dst,index, list_countries=list_coun
     main_df = pd.DataFrame()
     for country in list_countries:
         if db.at[index, country] == "TRUE":
-            sub_df = pd.read_excel(f'{country}.xlsx', index_col=0)
+            sub_df = pd.read_excel(f'prof_data/{country}.xlsx', index_col=0)
             main_df = main_df.append(sub_df)
 
     main_df.to_excel(final_dst)
