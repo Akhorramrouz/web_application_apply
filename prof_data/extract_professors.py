@@ -2,25 +2,24 @@ import pandas as pd
 
 list_countries = ['USA','Canada','Australia']
 
-def create_prof_db_base_on_country(db, final_dst,index, list_countries=list_countries):
+def create_prof_db_base_on_country(db,index, list_countries=list_countries):
     main_df = pd.DataFrame()
     for country in list_countries:
         if db.at[index, country] == "TRUE":
             sub_df = pd.read_excel(f'prof_data/{country}.xlsx', index_col=0)
             main_df = main_df.append(sub_df)
 
-    main_df.to_excel(final_dst)
     return main_df
 
 
 # In[22]:
 
 
-def selected_prof_based_on_seed_Research_interests( data_path, seed_set_research_interests,
+def selected_prof_based_on_seed_Research_interests( main_df, seed_set_research_interests,
                                                    threshhold_research_interests ,
                                                    max_number_of_itteration_on_generalizing_research_interests,):
 
-    data = pd.read_excel(data_path, index_col=0)
+    data = main_df
     data.head()
 
     data = data.fillna("--")
@@ -122,9 +121,8 @@ def organize_based_on_priority(selected_data, list_scores, len_seed):
 # In[25]:
 
 
-def exctract_best_proffesors(data_path,final_path, list_ri, strictness, expandability):
-    selected_data, list_scores, len_seed  = selected_prof_based_on_seed_Research_interests(data_path,list_ri,strictness, expandability)
+def exctract_best_proffesors(main_df, list_ri, strictness, expandability):
+    selected_data, list_scores, len_seed  = selected_prof_based_on_seed_Research_interests(main_df,list_ri,strictness, expandability)
     final_data = organize_based_on_priority(selected_data, list_scores, len_seed)
-    final_data.to_excel(final_path)
     return final_data
 

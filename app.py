@@ -389,13 +389,11 @@ if st.session_state.is_signed_in:
 
         strictness = df.at[st.session_state.index, "strictness"]
         expandability = df.at[st.session_state.index, 'expandability']
-        src_path = f'total_data_{df.at[st.session_state.index,"email_address"]}.xlsx'
-        dst_path = f'final_data_{df.at[st.session_state.index,"email_address"]}.xlsx'
-        create_prof_db_base_on_country(df,src_path,st.session_state.index)
+        main_df = create_prof_db_base_on_country(df,st.session_state.index)
         final_data = exctract_best_proffesors(
-            src_path,
-            dst_path,
+            main_df,
             st.session_state.list_research_interests,
             strictness,
             expandability
             )
+        st.dataframe(final_data.iloc[:10])
