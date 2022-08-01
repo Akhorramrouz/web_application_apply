@@ -396,4 +396,5 @@ if st.session_state.is_signed_in:
             strictness,
             expandability
             )
+        save_users_extracted_data(username,final_data)
         st.dataframe(final_data.iloc[:10])
