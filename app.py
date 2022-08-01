@@ -10,6 +10,7 @@ import pandas as pd
 import json
 import time
 from  streamlit_lottie import st_lottie
+from prof_data.extract_professors import *
 
 
 
@@ -379,4 +380,22 @@ if st.session_state.is_signed_in:
 
     if st.session_state.step_counter == 4:
         st.markdown(f'<center style="color:#AAFFAA;font-size:36px;">{"You have already requested for data of 10 professors"}</center>', unsafe_allow_html=True)
-        
+        df = load_db()
+        df = df.fillna("***")
+        st.session_state.list_research_interests = []
+        for ri_list_index in range(1,8):
+            if len(df.at[st.session_state.index,f"RI_{ri_list_index}"]) > 1:
+                st.session_state.list_research_interests.append(df.at[st.session_state.index,f"RI_{ri_list_index}"])
+
+        strictness = df.at[st.session_state.index, "strictness"]
+        expandability = df.at[st.session_state.index, 'expandability']
+        src_path = f'total_data_{df.at[st.session_state.index,"email_address"]}.xlsx'
+        dst_path = f'final_data_{df.at[st.session_state.index,"email_address"]}.xlsx'
+        create_prof_db_base_on_country(df,src_path,st.session_state.index)
+        final_data = exctract_best_proffesors(
+            src_path,
+            dst_path,
+            st.session_state.list_research_interests,
+            strictness,
+            expandability
+            )
